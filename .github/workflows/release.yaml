@@ -39,7 +39,7 @@ jobs:
           tar -czvf popcat-tuber-linux-x86_64.tar.gz popcat-tuber
           sha256sum popcat-tuber-linux-x86_64.tar.gz > popcat-tuber-linux-x86_64.tar.gz.sha256
 
-      - name: Upload to GitHub Releases
+      - name: Upload Linux release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
@@ -76,7 +76,9 @@ jobs:
 
       - name: Build release executable
         shell: msys2 {0}
-        run: cargo build --release --locked --target x86_64-pc-windows-gnullvm
+        run: |
+          export PATH="$(cygpath -u "$CARGO_HOME")/bin:$PATH"
+          cargo build --release --locked --target x86_64-pc-windows-gnullvm
 
       - name: Bundle executable & GTK4 runtime DLLs
         shell: msys2 {0}
