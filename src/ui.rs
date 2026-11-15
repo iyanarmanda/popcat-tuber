@@ -1,5 +1,9 @@
+use gtk4::gdk::Texture;
+use gtk4::gdk_pixbuf::Pixbuf;
+use gtk4::glib;
 use gtk4::prelude::*;
 use gtk4::{Application, ApplicationWindow, CssProvider, Image};
+use std::io::Cursor;
 use std::sync::{atomic::{AtomicBool, Ordering}, Arc};
 use std::time::Duration;
 
@@ -16,7 +20,19 @@ pub fn run_ui(is_talking: Arc<AtomicBool>) {
 }
 
 fn build_ui(app: &Application, is_talking: Arc<AtomicBool>) {
-    let image = Image::from_file("assets/popcat-close.png");
+    let close_pixbuf = Pixbuf::from_read(Cursor::new(
+        include_bytes!("../assets/popcat-close.png").as_slice(),
+    ))
+    .expect("failed to load popcat-close.png");
+
+    let open_pixbuf = Pixbuf::from_read(Cursor::new(
+        include_bytes!("../assets/popcat-open.png").as_slice(),
+    ))
+    .expect("failed to load popcat-open.png");
+
+    let close_texture = Texture::for_pixbuf(&close_pixbuf);
+    let open_texture = Texture::for_pixbuf(&open_pixbuf);
+    let image = Image::from_paintable(Some(&close_texture));
     image.set_pixel_size(400);
 
     let window = ApplicationWindow::builder()
@@ -42,9 +58,9 @@ fn build_ui(app: &Application, is_talking: Arc<AtomicBool>) {
 
         if current_state != last_state {
             if current_state {
-                image.set_from_file(Some("assets/popcat-open.png"));
+                image.set_paintable(Some(&open_texture));
             } else {
-                image.set_from_file(Some("assets/popcat-close.png"));
+                image.set_paintable(Some(&close_texture));
             }
             last_state = current_state;
         }
