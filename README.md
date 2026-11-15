@@ -1,5 +1,9 @@
 # PopCat Tuber
 
+## Spesification
+
+OS: Linux, Windows
+
 ## Tech Stack
 
 - Rust
